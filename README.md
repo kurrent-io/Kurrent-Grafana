@@ -43,6 +43,7 @@ _todo: automate!_
 1. expand/collapse the sections as appropriate
     - for the summary dashboard, expand them all
     - for the panels dashboard, collapse them all
+1. set the 'Instance' filter at the top to 'All'
 1. in the top-right click the blue `Share` button
 1. in the pop up click the `Export` tab
 1. set `Export for sharing externally` **false**
