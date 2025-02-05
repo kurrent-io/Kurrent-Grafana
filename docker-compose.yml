@@ -5,7 +5,7 @@ networks:
 
 services:
   prometheus:
-    image: prom/prometheus:v2.45.6
+    image: prom/prometheus:v3.1.0
     volumes:
       - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./data/prometheus:/prometheus
@@ -17,7 +17,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   grafana:
-    image: grafana/grafana:10.4.4
+    image: grafana/grafana:11.5.1
     volumes:
       - ./config/grafana/etc-grafana-provisioning:/etc/grafana/provisioning
       - ./data/grafana/var-lib-grafana:/var/lib/grafana
@@ -28,7 +28,7 @@ services:
       - kurrent-grafana-network
  
   otel-collector:
-    image: otel/opentelemetry-collector:0.103.1
+    image: otel/opentelemetry-collector:0.119.0
     command: ["--config=/etc/otel-collector-config.yml"]
     volumes:
       - ./config/collector/otel-collector-config.yml:/etc/otel-collector-config.yml
