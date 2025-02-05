@@ -2,13 +2,13 @@ global:
   scrape_interval: 1s
 
 scrape_configs:
-  - job_name: 'otel-collector'
+  - job_name: 'scrape-otel-collector'
     scrape_interval: 1s
     static_configs:
       - targets: ['otel-collector:8889']
       - targets: ['otel-collector:8888']
 
-  - job_name: "prometheus-exporter"
+  - job_name: "scrape-kurrentdb"
     scheme: https
     static_configs:
       - targets: ["host.docker.internal:2111"]

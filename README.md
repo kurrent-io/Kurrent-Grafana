@@ -1,5 +1,5 @@
-# EventStore-Grafana
-Grafana Dashboards for EventStoreDB
+# Kurrent-Grafana
+Grafana Dashboards for KurrentDB
 
 ## Dashboards
 
@@ -13,9 +13,9 @@ Grafana Dashboards for EventStoreDB
 
 ## Quick-start
 
-### 1. Run EventStore
+### 1. Run KurrentDB
 
-Run securely as normal with http exposed on any of the following ports: 2111, 2112, 2113, 2114
+Run one or more nodes securely as normal with `NodePort` set to 2111, 2112, 2113, 2114
 
 Does not have to be in containers.
 
@@ -70,7 +70,7 @@ _todo: automate!_
 
 ### Clean up (optional)
 
-- this is not usually necessary, updating to a commit with a different version of the dashboard will cause it to be reimported into the existin database
+- this is not usually necessary, updating to a commit with a different version of the dashboard will cause it to be reimported into the existing database
 - docker-compose rm
 - delete the data directory (nothing in there is committed)
 
