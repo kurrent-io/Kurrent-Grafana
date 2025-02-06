@@ -5,11 +5,11 @@ Grafana Dashboards for KurrentDB
 
 ### Summary
 
-- https://grafana.com/grafana/dashboards/19455-eventstore-cluster-summary/
+- https://grafana.com/grafana/dashboards/22824
 
 ### Panels
 
-- https://grafana.com/grafana/dashboards/19461-eventstore-panels/
+- https://grafana.com/grafana/dashboards/22823
 
 ## Quick-start
 
@@ -44,14 +44,17 @@ _todo: automate!_
     - for the summary dashboard, expand them all
     - for the panels dashboard, collapse them all
 1. set the 'Instance' filter at the top to 'All'
-1. in the top-right click the blue `Share` button
-1. in the pop up click the `Export` tab
-1. set `Export for sharing externally` **false**
-1. Adjust the appropriate dashboard in `./dashboards/` by either
-    - `Save to file` and replace the file with the new one or
-    - `View JSON` and copy/paste over the content of the file
+1. in the top-right click the `Export` button
+1. click 'Export as JSON'
+1. set `Export the dashboard to use in another instance` **false**
+1. Adjust the appropriate dashboard in `./dashboards/` by either clicking
+    - `Download file` and replace the file with the new one or
+    - `Copy to clipboard` and paste over the content of the file
 1. consider taking some screen shots for `./img`
-1. note that editing the file in `./dashboards` will cause it to be reimported automatically after a few seconds
+
+Alternatively, the json in `./dashboards/` can be edited manually.
+
+Note that editing the file in `./dashboards` will cause it to be reimported automatically after a few seconds.
 
 ### 6. PR
 
@@ -64,7 +67,7 @@ _todo: automate!_
 1. on the `main` branch
 2. add a git tag (todo: elaborate)
 3. export for sharing. similar to the internal export except:
-    - set `Export for sharing externally` **true**
+    - set `Export the dashboard to use in another instance` **true**
     - `Save to file` and use this file for uploading
 4. upload (todo: elaborate)
 
