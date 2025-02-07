@@ -24,9 +24,8 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 4,
   "links": [],
-  "liveNow": false,
   "panels": [
     {
       "collapsed": true,
@@ -130,7 +129,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "rate(eventstore_cache_hits_misses{instance=~\"$Instance\"}[$__rate_interval])",
+              "expr": "rate(kurrentdb_cache_hits_misses_total{instance=~\"$Instance\"}[$__rate_interval])",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -205,8 +204,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -250,7 +248,7 @@
               },
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "eventstore_cache_resources_bytes{instance=~\"$Instance\", kind=\"size\"}",
+              "expr": "kurrentdb_cache_resources_bytes{instance=~\"$Instance\", kind=\"size\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -311,8 +309,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -356,7 +353,7 @@
               },
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "eventstore_cache_resources_entries{instance=~\"$Instance\", kind=\"count\"}",
+              "expr": "kurrentdb_cache_resources_entries{instance=~\"$Instance\", kind=\"count\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -417,8 +414,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -462,7 +458,7 @@
               },
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "eventstore_cache_resources_bytes{instance=~\"$Instance\", kind=\"capacity\"}",
+              "expr": "kurrentdb_cache_resources_bytes{instance=~\"$Instance\", kind=\"capacity\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -523,8 +519,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -568,7 +563,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "eventstore_cache_resources_bytes{instance=~\"$Instance\", kind=\"size\"} / ignoring(kind) eventstore_cache_resources_bytes{instance=~\"$Instance\", kind=\"capacity\"}",
+              "expr": "kurrentdb_cache_resources_bytes{instance=~\"$Instance\", kind=\"size\"} / ignoring(kind) kurrentdb_cache_resources_bytes{instance=~\"$Instance\", kind=\"capacity\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -686,7 +681,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "code",
-              "expr": "scalar(max(eventstore_checkpoints{name=\"writer\", read=\"non-flushed\"})) - eventstore_checkpoints{instance=~\"$Instance\", name=\"replication\", read=\"non-flushed\"}",
+              "expr": "scalar(max(kurrentdb_checkpoints{name=\"writer\", read=\"non-flushed\"})) - kurrentdb_checkpoints{instance=~\"$Instance\", name=\"replication\", read=\"non-flushed\"}",
               "interval": "",
               "legendFormat": "{{instance}}",
               "range": true,
@@ -788,7 +783,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "builder",
-              "expr": "eventstore_checkpoints{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_checkpoints{instance=~\"$Instance\"}",
               "interval": "",
               "legendFormat": "{{instance}} - {{name}}",
               "range": true,
@@ -861,8 +856,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -903,7 +897,7 @@
               },
               "disableTextWrap": false,
               "editorMode": "builder",
-              "expr": "rate(eventstore_io_events{instance=~\"$Instance\", activity=\"read\"}[$__rate_interval])",
+              "expr": "rate(kurrentdb_io_events_total{instance=~\"$Instance\", activity=\"read\"}[$__rate_interval])",
               "fullMetaSearch": false,
               "includeNullMetadata": true,
               "legendFormat": "{{instance}}",
@@ -964,8 +958,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1006,7 +999,7 @@
               },
               "disableTextWrap": false,
               "editorMode": "builder",
-              "expr": "rate(eventstore_io_events{instance=~\"$Instance\", activity=\"written\"}[$__rate_interval])",
+              "expr": "rate(kurrentdb_io_events_total{instance=~\"$Instance\", activity=\"written\"}[$__rate_interval])",
               "fullMetaSearch": false,
               "includeNullMetadata": true,
               "legendFormat": "{{instance}}",
@@ -1067,8 +1060,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1109,7 +1101,7 @@
               },
               "disableTextWrap": false,
               "editorMode": "builder",
-              "expr": "rate(eventstore_io_bytes{instance=~\"$Instance\", activity=\"read\"}[$__rate_interval])",
+              "expr": "rate(kurrentdb_io_bytes_total{instance=~\"$Instance\", activity=\"read\"}[$__rate_interval])",
               "fullMetaSearch": false,
               "includeNullMetadata": true,
               "legendFormat": "{{instance}}",
@@ -1170,8 +1162,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1211,7 +1202,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "builder",
-              "expr": "rate(eventstore_checkpoints{instance=~\"$Instance\", name=\"writer\"}[$__rate_interval])",
+              "expr": "rate(kurrentdb_checkpoints{instance=~\"$Instance\", name=\"writer\"}[$__rate_interval])",
               "hide": false,
               "interval": "",
               "legendFormat": "{{instance}}",
@@ -1238,8 +1229,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               },
@@ -1281,7 +1271,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(le) (rate(eventstore_logical_chunk_read_distribution_bucket{instance=~\"$Instance\"}[$__range]))",
+              "expr": "sum by(le) (rate(kurrentdb_logical_chunk_read_distribution_bucket{instance=~\"$Instance\"}[$__range]))",
               "format": "heatmap",
               "instant": true,
               "interval": "",
@@ -1298,57 +1288,51 @@
                 "excludeByName": {},
                 "includeByName": {},
                 "indexByName": {
-                  "0": 21,
-                  "1": 20,
-                  "2": 19,
-                  "4": 18,
-                  "8": 17,
-                  "16": 16,
-                  "32": 15,
-                  "64": 14,
-                  "128": 13,
-                  "256": 12,
-                  "512": 11,
-                  "1024": 10,
-                  "2048": 9,
-                  "4096": 8,
-                  "8192": 7,
-                  "16384": 6,
-                  "32768": 5,
-                  "65536": 4,
-                  "131072": 3,
-                  "262144": 2,
                   "+Inf": 1,
+                  "0.0": 21,
+                  "1.0": 20,
+                  "1024.0": 10,
+                  "128.0": 13,
+                  "131072.0": 3,
+                  "16.0": 16,
+                  "16384.0": 6,
+                  "2.0": 19,
+                  "2048.0": 9,
+                  "256.0": 12,
+                  "262144.0": 2,
+                  "32.0": 15,
+                  "32768.0": 5,
+                  "4.0": 18,
+                  "4096.0": 8,
+                  "512.0": 11,
+                  "64.0": 14,
+                  "65536.0": 4,
+                  "8.0": 17,
+                  "8192.0": 7,
                   "Time": 0
                 },
                 "renameByName": {
-                  "0": "",
-                  "1": "1",
-                  "2": "2",
-                  "4": "2^2",
-                  "8": "2^3",
-                  "10": "10 s",
-                  "16": "2^4",
-                  "32": "2^5",
-                  "64": "2^6",
-                  "128": "2^7",
-                  "256": "2^8",
-                  "512": "2^9",
-                  "1024": "2^10",
-                  "2048": "2^11",
-                  "4096": "2^12",
-                  "8192": "2^13",
-                  "16384": "2^14",
-                  "32768": "2^15",
-                  "65536": "2^16",
-                  "131072": "2^17",
-                  "262144": "2^18",
-                  "0.0001": "100 μs",
-                  "0.001": "1 ms",
-                  "0.01": "10 ms",
-                  "0.1": "100 ms",
-                  "1E-05": "10 μs",
-                  "1E-06": "1 μs"
+                  "0.0": "",
+                  "1.0": "1",
+                  "10.0": "10 s",
+                  "1024.0": "2^10",
+                  "128.0": "2^7",
+                  "131072.0": "2^17",
+                  "16.0": "2^4",
+                  "16384.0": "2^14",
+                  "2.0": "2",
+                  "2048.0": "2^11",
+                  "256.0": "2^8",
+                  "262144.0": "2^18",
+                  "32.0": "2^5",
+                  "32768.0": "2^15",
+                  "4.0": "2^2",
+                  "4096.0": "2^12",
+                  "512.0": "2^9",
+                  "64.0": "2^6",
+                  "65536.0": "2^16",
+                  "8.0": "2^3",
+                  "8192.0": "2^13"
                 }
               }
             }
@@ -1405,8 +1389,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1446,7 +1429,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "code",
-              "expr": "rate(eventstore_io_bytes{instance=~\"$Instance\", activity=\"read\"}[$__rate_interval]) / rate(eventstore_io_events{instance=~\"$Instance\", activity=\"read\"}[$__rate_interval])",
+              "expr": "rate(kurrentdb_io_bytes_total{instance=~\"$Instance\", activity=\"read\"}[$__rate_interval]) / rate(kurrentdb_io_events_total{instance=~\"$Instance\", activity=\"read\"}[$__rate_interval])",
               "legendFormat": "{{instance}} - {{activity}}",
               "range": true,
               "refId": "A"
@@ -1472,8 +1455,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               },
@@ -1515,7 +1497,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(le) (rate(eventstore_io_record_read_duration_seconds_bucket{instance=~\"$Instance\", source=\"ChunkCache\"}[$__range]))",
+              "expr": "sum by(le) (rate(kurrentdb_io_record_read_duration_seconds_bucket{instance=~\"$Instance\", source=\"ChunkCache\"}[$__range]))",
               "format": "heatmap",
               "instant": true,
               "interval": "",
@@ -1531,26 +1513,26 @@
               "options": {
                 "excludeByName": {},
                 "indexByName": {
-                  "1": 3,
-                  "10": 2,
                   "+Inf": 1,
                   "0.0001": 7,
                   "0.001": 6,
                   "0.01": 5,
                   "0.1": 4,
-                  "1E-05": 8,
-                  "1E-06": 9,
+                  "1.0": 3,
+                  "10.0": 2,
+                  "1e-05": 8,
+                  "1e-06": 9,
                   "Time": 0
                 },
                 "renameByName": {
-                  "1": "1 s",
-                  "10": "10 s",
                   "0.0001": "100 μs",
                   "0.001": "1 ms",
                   "0.01": "10 ms",
                   "0.1": "100 ms",
-                  "1E-05": "10 μs",
-                  "1E-06": "1 μs"
+                  "1.0": "1 s",
+                  "10.0": "10 s",
+                  "1e-05": "10 μs",
+                  "1e-06": "1 μs"
                 }
               }
             }
@@ -1574,8 +1556,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               },
@@ -1617,7 +1598,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(le) (rate(eventstore_io_record_read_duration_seconds_bucket{instance=~\"$Instance\", source=\"FileSystem\"}[$__range]))",
+              "expr": "sum by(le) (rate(kurrentdb_io_record_read_duration_seconds_bucket{instance=~\"$Instance\", source=\"FileSystem\"}[$__range]))",
               "format": "heatmap",
               "instant": true,
               "interval": "",
@@ -1633,26 +1614,26 @@
               "options": {
                 "excludeByName": {},
                 "indexByName": {
-                  "1": 3,
-                  "10": 2,
                   "+Inf": 1,
                   "0.0001": 7,
                   "0.001": 6,
                   "0.01": 5,
                   "0.1": 4,
-                  "1E-05": 8,
-                  "1E-06": 9,
+                  "1.0": 3,
+                  "10.0": 2,
+                  "1e-05": 8,
+                  "1e-06": 9,
                   "Time": 0
                 },
                 "renameByName": {
-                  "1": "1 s",
-                  "10": "10 s",
                   "0.0001": "100 μs",
                   "0.001": "1 ms",
                   "0.01": "10 ms",
                   "0.1": "100 ms",
-                  "1E-05": "10 μs",
-                  "1E-06": "1 μs"
+                  "1.0": "1 s",
+                  "10.0": "10 s",
+                  "1e-05": "10 μs",
+                  "1e-06": "1 μs"
                 }
               }
             }
@@ -1676,8 +1657,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               },
@@ -1719,7 +1699,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(le) (rate(eventstore_io_record_read_duration_seconds_bucket{instance=~\"$Instance\", source=\"Archive\"}[$__range]))",
+              "expr": "sum by(le) (rate(kurrentdb_io_record_read_duration_seconds_bucket{instance=~\"$Instance\", source=\"Archive\"}[$__range]))",
               "format": "heatmap",
               "instant": true,
               "interval": "",
@@ -1735,26 +1715,26 @@
               "options": {
                 "excludeByName": {},
                 "indexByName": {
-                  "1": 3,
-                  "10": 2,
                   "+Inf": 1,
                   "0.0001": 7,
                   "0.001": 6,
                   "0.01": 5,
                   "0.1": 4,
-                  "1E-05": 8,
-                  "1E-06": 9,
+                  "1.0": 3,
+                  "10.0": 2,
+                  "1e-05": 8,
+                  "1e-06": 9,
                   "Time": 0
                 },
                 "renameByName": {
-                  "1": "1 s",
-                  "10": "10 s",
                   "0.0001": "100 μs",
                   "0.001": "1 ms",
                   "0.01": "10 ms",
                   "0.1": "100 ms",
-                  "1E-05": "10 μs",
-                  "1E-06": "1 μs"
+                  "1.0": "1 s",
+                  "10.0": "10 s",
+                  "1e-05": "10 μs",
+                  "1e-06": "1 μs"
                 }
               }
             }
@@ -1791,8 +1771,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               },
@@ -1834,7 +1813,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(le) (increase(eventstore_gossip_latency_seconds_bucket{instance=~\"$Instance\", activity=\"push-to-peer\"}[$__range]))",
+              "expr": "sum by(le) (increase(kurrentdb_gossip_latency_seconds_bucket{instance=~\"$Instance\", activity=\"push-to-peer\"}[$__range]))",
               "format": "heatmap",
               "instant": true,
               "interval": "",
@@ -1850,8 +1829,6 @@
               "options": {
                 "excludeByName": {},
                 "indexByName": {
-                  "1": 3,
-                  "5": 2,
                   "+Inf": 1,
                   "0.001": 9,
                   "0.005": 8,
@@ -1859,12 +1836,11 @@
                   "0.05": 6,
                   "0.1": 5,
                   "0.5": 4,
+                  "1.0": 3,
+                  "5.0": 2,
                   "Time": 0
                 },
                 "renameByName": {
-                  "1": "1,000 ms",
-                  "5": "5,000 ms",
-                  "10": "10 s",
                   "0.0001": "100 μs",
                   "0.001": "1 ms",
                   "0.005": "5 ms",
@@ -1872,8 +1848,9 @@
                   "0.05": "50 ms",
                   "0.1": "100 ms",
                   "0.5": "500 ms",
-                  "1E-05": "10 μs",
-                  "1E-06": "1 μs"
+                  "1.0": "1,000 ms",
+                  "10.0": "10 s",
+                  "5.0": "5,000 ms"
                 }
               }
             }
@@ -1896,8 +1873,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "orange",
-                    "value": null
+                    "color": "orange"
                   }
                 ]
               },
@@ -1939,7 +1915,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(le) (increase(eventstore_gossip_latency_seconds_bucket{instance=~\"$Instance\", activity=\"push-to-peer\", status=\"failed\"}[$__range]))",
+              "expr": "sum by(le) (increase(kurrentdb_gossip_latency_seconds_bucket{instance=~\"$Instance\", activity=\"push-to-peer\", status=\"failed\"}[$__range]))",
               "format": "heatmap",
               "instant": true,
               "interval": "",
@@ -1955,8 +1931,6 @@
               "options": {
                 "excludeByName": {},
                 "indexByName": {
-                  "1": 3,
-                  "5": 2,
                   "+Inf": 1,
                   "0.001": 9,
                   "0.005": 8,
@@ -1964,12 +1938,11 @@
                   "0.05": 6,
                   "0.1": 5,
                   "0.5": 4,
+                  "1.0": 3,
+                  "5.0": 2,
                   "Time": 0
                 },
                 "renameByName": {
-                  "1": "1,000 ms",
-                  "5": "5,000 ms",
-                  "10": "10 s",
                   "0.0001": "100 μs",
                   "0.001": "1 ms",
                   "0.005": "5 ms",
@@ -1977,8 +1950,9 @@
                   "0.05": "50 ms",
                   "0.1": "100 ms",
                   "0.5": "500 ms",
-                  "1E-05": "10 μs",
-                  "1E-06": "1 μs"
+                  "1.0": "1,000 ms",
+                  "10.0": "10 s",
+                  "5.0": "5,000 ms"
                 }
               }
             }
@@ -2035,8 +2009,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2079,7 +2052,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "code",
-              "expr": "sum by(instance) (rate(eventstore_gossip_latency_seconds_sum{instance=~\"$Instance\", activity=\"push-to-peer\"}[$__rate_interval])) / sum by(instance) (rate(eventstore_gossip_latency_seconds_count{instance=~\"$Instance\", activity=\"push-to-peer\"}[$__rate_interval]))",
+              "expr": "sum by(instance) (rate(kurrentdb_gossip_latency_seconds_sum{instance=~\"$Instance\", activity=\"push-to-peer\"}[$__rate_interval])) / sum by(instance) (rate(kurrentdb_gossip_latency_seconds_count{instance=~\"$Instance\", activity=\"push-to-peer\"}[$__rate_interval]))",
               "interval": "",
               "legendFormat": "{{instance}}",
               "range": true,
@@ -2105,8 +2078,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               },
@@ -2148,7 +2120,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(le) (increase(eventstore_gossip_processing_duration_seconds_bucket{instance=~\"$Instance\", status=\"successful\"}[$__range]))",
+              "expr": "sum by(le) (increase(kurrentdb_gossip_processing_duration_seconds_bucket{instance=~\"$Instance\", status=\"successful\"}[$__range]))",
               "format": "heatmap",
               "instant": true,
               "interval": "",
@@ -2164,26 +2136,26 @@
               "options": {
                 "excludeByName": {},
                 "indexByName": {
-                  "1": 3,
-                  "10": 2,
                   "+Inf": 1,
                   "0.0001": 7,
                   "0.001": 6,
                   "0.01": 5,
                   "0.1": 4,
-                  "1E-05": 8,
-                  "1E-06": 9,
+                  "1.0": 3,
+                  "10.0": 2,
+                  "1e-05": 8,
+                  "1e-06": 9,
                   "Time": 0
                 },
                 "renameByName": {
-                  "1": "1 s",
-                  "10": "10 s",
                   "0.0001": "100 μs",
                   "0.001": "1 ms",
                   "0.01": "10 ms",
                   "0.1": "100 ms",
-                  "1E-05": "10 μs",
-                  "1E-06": "1 μs"
+                  "1.0": "1 s",
+                  "10.0": "10 s",
+                  "1e-05": "10 μs",
+                  "1e-06": "1 μs"
                 }
               }
             }
@@ -2206,8 +2178,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "orange",
-                    "value": null
+                    "color": "orange"
                   }
                 ]
               },
@@ -2249,7 +2220,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(le) (increase(eventstore_gossip_processing_duration_seconds_bucket{instance=~\"$Instance\", status=\"failed\"}[$__range]))",
+              "expr": "sum by(le) (increase(kurrentdb_gossip_processing_duration_seconds_bucket{instance=~\"$Instance\", status=\"failed\"}[$__range]))",
               "format": "heatmap",
               "instant": true,
               "interval": "",
@@ -2265,26 +2236,26 @@
               "options": {
                 "excludeByName": {},
                 "indexByName": {
-                  "1": 3,
-                  "10": 2,
                   "+Inf": 1,
                   "0.0001": 7,
                   "0.001": 6,
                   "0.01": 5,
                   "0.1": 4,
-                  "1E-05": 8,
-                  "1E-06": 9,
+                  "1.0": 3,
+                  "10.0": 2,
+                  "1e-05": 8,
+                  "1e-06": 9,
                   "Time": 0
                 },
                 "renameByName": {
-                  "1": "1 s",
-                  "10": "10 s",
                   "0.0001": "100 μs",
                   "0.001": "1 ms",
                   "0.01": "10 ms",
                   "0.1": "100 ms",
-                  "1E-05": "10 μs",
-                  "1E-06": "1 μs"
+                  "1.0": "1 s",
+                  "10.0": "10 s",
+                  "1e-05": "10 μs",
+                  "1e-06": "1 μs"
                 }
               }
             }
@@ -2354,8 +2325,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2398,7 +2368,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "code",
-              "expr": "rate(eventstore_incoming_grpc_calls{instance=~\"$Instance\"}[$__rate_interval])",
+              "expr": "rate(kurrentdb_incoming_grpc_calls_total{instance=~\"$Instance\"}[$__rate_interval])",
               "legendFormat": "{{instance}} - {{kind}}",
               "range": true,
               "refId": "A"
@@ -2455,8 +2425,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2499,7 +2468,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "code",
-              "expr": "eventstore_current_incoming_grpc_calls{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_current_incoming_grpc_calls{instance=~\"$Instance\"}",
               "interval": "",
               "legendFormat": "{{instance}}",
               "range": true,
@@ -2525,8 +2494,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               },
@@ -2568,7 +2536,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(le) (increase(eventstore_grpc_method_duration_seconds_bucket{instance=~\"$Instance\", activity=\"read\", status=\"successful\"}[$__range]))",
+              "expr": "sum by(le) (increase(kurrentdb_grpc_method_duration_seconds_bucket{instance=~\"$Instance\", activity=\"read\", status=\"successful\"}[$__range]))",
               "format": "heatmap",
               "instant": true,
               "interval": "",
@@ -2584,26 +2552,26 @@
               "options": {
                 "excludeByName": {},
                 "indexByName": {
-                  "1": 3,
-                  "10": 2,
                   "+Inf": 1,
                   "0.0001": 7,
                   "0.001": 6,
                   "0.01": 5,
                   "0.1": 4,
-                  "1E-05": 8,
-                  "1E-06": 9,
+                  "1.0": 3,
+                  "10.0": 2,
+                  "1e-05": 8,
+                  "1e-06": 9,
                   "Time": 0
                 },
                 "renameByName": {
-                  "1": "1 s",
-                  "10": "10 s",
                   "0.0001": "100 μs",
                   "0.001": "1 ms",
                   "0.01": "10 ms",
                   "0.1": "100 ms",
-                  "1E-05": "10 μs",
-                  "1E-06": "1 μs"
+                  "1.0": "1 s",
+                  "10.0": "10 s",
+                  "1e-05": "10 μs",
+                  "1e-06": "1 μs"
                 }
               }
             }
@@ -2626,8 +2594,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   }
                 ]
               },
@@ -2669,7 +2636,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(le) (increase(eventstore_grpc_method_duration_seconds_bucket{instance=~\"$Instance\", activity=\"append\", status=\"successful\"}[$__range]))  ",
+              "expr": "sum by(le) (increase(kurrentdb_grpc_method_duration_seconds_bucket{instance=~\"$Instance\", activity=\"append\", status=\"successful\"}[$__range]))  ",
               "format": "heatmap",
               "instant": true,
               "interval": "",
@@ -2685,26 +2652,26 @@
               "options": {
                 "excludeByName": {},
                 "indexByName": {
-                  "1": 3,
-                  "10": 2,
                   "+Inf": 1,
                   "0.0001": 7,
                   "0.001": 6,
                   "0.01": 5,
                   "0.1": 4,
-                  "1E-05": 8,
-                  "1E-06": 9,
+                  "1.0": 3,
+                  "10.0": 2,
+                  "1e-05": 8,
+                  "1e-06": 9,
                   "Time": 0
                 },
                 "renameByName": {
-                  "1": "1 s",
-                  "10": "10 s",
                   "0.0001": "100 μs",
                   "0.001": "1 ms",
                   "0.01": "10 ms",
                   "0.1": "100 ms",
-                  "1E-05": "10 μs",
-                  "1E-06": "1 μs"
+                  "1.0": "1 s",
+                  "10.0": "10 s",
+                  "1e-05": "10 μs",
+                  "1e-06": "1 μs"
                 }
               }
             }
@@ -2727,8 +2694,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "orange",
-                    "value": null
+                    "color": "orange"
                   }
                 ]
               },
@@ -2770,7 +2736,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(le) (increase(eventstore_grpc_method_duration_seconds_bucket{instance=~\"$Instance\", activity=\"read\", status=\"failed\"}[$__range]))",
+              "expr": "sum by(le) (increase(kurrentdb_grpc_method_duration_seconds_bucket{instance=~\"$Instance\", activity=\"read\", status=\"failed\"}[$__range]))",
               "format": "heatmap",
               "instant": true,
               "interval": "",
@@ -2786,27 +2752,27 @@
               "options": {
                 "excludeByName": {},
                 "indexByName": {
-                  "1": 3,
-                  "10": 2,
                   "+Inf": 1,
                   "0.0001": 7,
                   "0.001": 6,
                   "0.01": 5,
                   "0.1": 4,
-                  "1E-05": 8,
-                  "1E-06": 9,
+                  "1.0": 3,
+                  "10.0": 2,
+                  "1e-05": 8,
+                  "1e-06": 9,
                   "Time": 0
                 },
                 "renameByName": {
-                  "1": "1 s",
-                  "10": "10 s",
                   "+Inf": "",
                   "0.0001": "100 μs",
                   "0.001": "1 ms",
                   "0.01": "10 ms",
                   "0.1": "100 ms",
-                  "1E-05": "10 μs",
-                  "1E-06": "1 μs"
+                  "1.0": "1 s",
+                  "10.0": "10 s",
+                  "1e-05": "10 μs",
+                  "1e-06": "1 μs"
                 }
               }
             }
@@ -2829,8 +2795,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "orange",
-                    "value": null
+                    "color": "orange"
                   }
                 ]
               },
@@ -2872,7 +2837,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(le) (increase(eventstore_grpc_method_duration_seconds_bucket{instance=~\"$Instance\", activity=\"append\", status=\"failed\"}[$__range]))",
+              "expr": "sum by(le) (increase(kurrentdb_grpc_method_duration_seconds_bucket{instance=~\"$Instance\", activity=\"append\", status=\"failed\"}[$__range]))",
               "format": "heatmap",
               "instant": true,
               "interval": "",
@@ -2888,26 +2853,26 @@
               "options": {
                 "excludeByName": {},
                 "indexByName": {
-                  "1": 3,
-                  "10": 2,
                   "+Inf": 1,
                   "0.0001": 7,
                   "0.001": 6,
                   "0.01": 5,
                   "0.1": 4,
-                  "1E-05": 8,
-                  "1E-06": 9,
+                  "1.0": 3,
+                  "10.0": 2,
+                  "1e-05": 8,
+                  "1e-06": 9,
                   "Time": 0
                 },
                 "renameByName": {
-                  "1": "1 s",
-                  "10": "10 s",
                   "0.0001": "100 μs",
                   "0.001": "1 ms",
                   "0.01": "10 ms",
                   "0.1": "100 ms",
-                  "1E-05": "10 μs",
-                  "1E-06": "1 μs"
+                  "1.0": "1 s",
+                  "10.0": "10 s",
+                  "1e-05": "10 μs",
+                  "1e-06": "1 μs"
                 }
               }
             }
@@ -2964,8 +2929,7 @@
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3008,7 +2972,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "builder",
-              "expr": "eventstore_kestrel_connections{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_kestrel_connections{instance=~\"$Instance\"}",
               "legendFormat": "{{instance}} - {{kind}}",
               "range": true,
               "refId": "A"
@@ -3123,7 +3087,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "builder",
-              "expr": "eventstore_gc_pause_duration_max_seconds{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_gc_pause_duration_max_seconds{instance=~\"$Instance\"}",
               "interval": "",
               "legendFormat": "{{instance}} - {{name}}",
               "range": true,
@@ -3225,7 +3189,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "builder",
-              "expr": "rate(eventstore_gc_collection_count{instance=~\"$Instance\"}[$__rate_interval])",
+              "expr": "rate(kurrentdb_gc_collection_count_total{instance=~\"$Instance\"}[$__rate_interval])",
               "interval": "",
               "legendFormat": "{{instance}} - {{generation}}",
               "range": true,
@@ -3291,7 +3255,7 @@
                   }
                 ]
               },
-              "unit": "percentunit"
+              "unit": "percent"
             },
             "overrides": []
           },
@@ -3326,7 +3290,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "builder",
-              "expr": "eventstore_gc_time_in_gc{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_gc_time_in_gc{instance=~\"$Instance\"}",
               "interval": "",
               "legendFormat": "{{instance}}",
               "range": true,
@@ -3428,7 +3392,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "builder",
-              "expr": "eventstore_gc_generation_size_bytes{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_gc_generation_size_bytes{instance=~\"$Instance\"}",
               "interval": "",
               "legendFormat": "{{instance}} - {{generation}}",
               "range": true,
@@ -3530,7 +3494,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "builder",
-              "expr": "rate(eventstore_gc_total_allocated{instance=~\"$Instance\"}[$__rate_interval])",
+              "expr": "rate(kurrentdb_gc_allocated_bytes_total{instance=~\"$Instance\"}[$__rate_interval])",
               "interval": "",
               "legendFormat": "{{instance}}",
               "range": true,
@@ -3538,108 +3502,6 @@
             }
           ],
           "title": "Allocation Rate",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "description": "Not available in 23.10.0",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "smooth",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "decimals": 1,
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 16,
-            "y": 54
-          },
-          "id": 98,
-          "options": {
-            "legend": {
-              "calcs": [
-                "last"
-              ],
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": true,
-              "sortBy": "Last",
-              "sortDesc": true
-            },
-            "tooltip": {
-              "maxHeight": 600,
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
-              },
-              "editorMode": "builder",
-              "expr": "rate(eventstore_buffers_allocated{instance=~\"$Instance\"}[$__rate_interval])",
-              "interval": "",
-              "legendFormat": "{{instance}}",
-              "range": true,
-              "refId": "A"
-            }
-          ],
-          "title": "Buffer Allocation Rate",
           "type": "timeseries"
         }
       ],
@@ -3750,7 +3612,7 @@
               "disableTextWrap": false,
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(instance,event_stream_id,group_name) (rate(eventstore_persistent_sub_items_processed{instance=~\"$Instance\"}[$__rate_interval]))",
+              "expr": "sum by(instance,event_stream_id,group_name) (rate(kurrentdb_persistent_sub_items_processed_total{instance=~\"$Instance\"}[$__rate_interval]))",
               "format": "time_series",
               "fullMetaSearch": false,
               "hide": false,
@@ -3857,7 +3719,7 @@
               "disableTextWrap": false,
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "eventstore_persistent_sub_in_flight_messages{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_persistent_sub_in_flight_messages{instance=~\"$Instance\"}",
               "format": "time_series",
               "fullMetaSearch": false,
               "includeNullMetadata": true,
@@ -3964,7 +3826,7 @@
               "disableTextWrap": false,
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "eventstore_persistent_sub_connections{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_persistent_sub_connections{instance=~\"$Instance\"}",
               "format": "time_series",
               "fullMetaSearch": false,
               "includeNullMetadata": true,
@@ -4072,7 +3934,7 @@
               "disableTextWrap": false,
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(instance,event_stream_id,group_name) (eventstore_persistent_sub_last_known_event_number{instance=~\"$Instance\"}) - sum by(instance,event_stream_id,group_name) (eventstore_persistent_sub_checkpointed_event_number{instance=~\"$Instance\"})",
+              "expr": "sum by(instance,event_stream_id,group_name) (kurrentdb_persistent_sub_last_known_event_number{instance=~\"$Instance\"}) - sum by(instance,event_stream_id,group_name) (kurrentdb_persistent_sub_checkpointed_event_number{instance=~\"$Instance\"})",
               "format": "time_series",
               "fullMetaSearch": false,
               "hide": false,
@@ -4179,7 +4041,7 @@
               "disableTextWrap": false,
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "eventstore_persistent_sub_parked_messages{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_persistent_sub_parked_messages{instance=~\"$Instance\"}",
               "format": "time_series",
               "fullMetaSearch": false,
               "includeNullMetadata": true,
@@ -4285,7 +4147,7 @@
               "disableTextWrap": false,
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "eventstore_persistent_sub_oldest_parked_message_seconds{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_persistent_sub_oldest_parked_message_seconds{instance=~\"$Instance\"}",
               "format": "time_series",
               "fullMetaSearch": false,
               "includeNullMetadata": true,
@@ -4301,7 +4163,7 @@
           "type": "timeseries"
         }
       ],
-      "title": "Persistent Subscriptions (v24.6+)",
+      "title": "Persistent Subscriptions",
       "type": "row"
     },
     {
@@ -4424,7 +4286,7 @@
               "disableTextWrap": false,
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum(eventstore_projection_progress{instance=~\"$Instance\"}) by (instance,projection)",
+              "expr": "sum(kurrentdb_projection_progress{instance=~\"$Instance\"}) by (instance,projection)",
               "format": "time_series",
               "fullMetaSearch": false,
               "includeNullMetadata": true,
@@ -4533,7 +4395,7 @@
               "disableTextWrap": false,
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sum by(instance,projection) (rate(eventstore_projection_events_processed_after_restart_total{instance=~\"$Instance\"}[$__rate_interval]))",
+              "expr": "sum by(instance,projection) (rate(kurrentdb_projection_events_processed_after_restart_total{instance=~\"$Instance\"}[$__rate_interval]))",
               "format": "time_series",
               "fullMetaSearch": false,
               "includeNullMetadata": true,
@@ -4666,7 +4528,7 @@
               "disableTextWrap": false,
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "sum by(projection, instance) (eventstore_projection_running{instance=~\"$Instance\"})",
+              "expr": "sum by(projection, instance) (kurrentdb_projection_running{instance=~\"$Instance\"})",
               "format": "time_series",
               "fullMetaSearch": false,
               "includeNullMetadata": true,
@@ -4728,7 +4590,7 @@
           "type": "table"
         }
       ],
-      "title": "Projections (v24.6+)",
+      "title": "Projections",
       "type": "row"
     },
     {
@@ -4832,7 +4694,7 @@
               },
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "eventstore_queue_queueing_duration_max_seconds{instance=~\"$Instance\", range=\"16-20 seconds\"}",
+              "expr": "kurrentdb_queue_queueing_duration_max_seconds{instance=~\"$Instance\", range=\"16-20 seconds\"}",
               "format": "time_series",
               "instant": false,
               "legendFormat": "{{instance}} - {{name}}",
@@ -4935,7 +4797,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "builder",
-              "expr": "eventstore_proc_thread_pool_pending_work_item_count{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_proc_thread_pool_pending_work_item_count{instance=~\"$Instance\"}",
               "interval": "",
               "legendFormat": "{{instance}} - {{name}}",
               "range": true,
@@ -5037,7 +4899,7 @@
               },
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "sum by(queue) (rate(eventstore_queue_processing_duration_seconds_count[$__rate_interval]))",
+              "expr": "sum by(queue) (rate(kurrentdb_queue_processing_duration_seconds_count[$__rate_interval]))",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -5141,7 +5003,7 @@
               },
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "sum by(message_type) (rate(eventstore_queue_processing_duration_seconds_count{instance=~\"$Instance\"}[$__rate_interval]))",
+              "expr": "sum by(message_type) (rate(kurrentdb_queue_processing_duration_seconds_count{instance=~\"$Instance\"}[$__rate_interval]))",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -5222,7 +5084,7 @@
                 "uid": "PBFA97CFB590B2093"
               },
               "editorMode": "builder",
-              "expr": "min by(instance) (eventstore_proc_up_time{instance=~\"$Instance\"})",
+              "expr": "min by(instance) (kurrentdb_proc_up_time_seconds_total{instance=~\"$Instance\"})",
               "interval": "",
               "legendFormat": "__auto",
               "range": true,
@@ -5430,7 +5292,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "topk by(instance) (1, eventstore_statuses{name=\"Node\", instance=~\"$Instance\"})",
+              "expr": "topk by(instance) (1, kurrentdb_statuses{name=\"Node\", instance=~\"$Instance\"})",
               "format": "table",
               "hide": false,
               "instant": false,
@@ -5569,7 +5431,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "topk by(instance) (1, eventstore_statuses{name=\"Scavenge\", instance=~\"$Instance\"})",
+              "expr": "topk by(instance) (1, kurrentdb_statuses{name=\"Scavenge\", instance=~\"$Instance\"})",
               "format": "table",
               "hide": false,
               "instant": false,
@@ -5702,7 +5564,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "topk by(instance) (1, eventstore_statuses{name=\"Index\", instance=~\"$Instance\"})",
+              "expr": "topk by(instance) (1, kurrentdb_statuses{name=\"Index\", instance=~\"$Instance\"})",
               "format": "table",
               "hide": false,
               "instant": false,
@@ -5839,7 +5701,7 @@
               },
               "editorMode": "builder",
               "exemplar": false,
-              "expr": "eventstore_writer_flush_size_max{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_writer_flush_size_max{instance=~\"$Instance\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -5940,7 +5802,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "eventstore_writer_flush_duration_max_seconds{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_writer_flush_duration_max_seconds{instance=~\"$Instance\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -6060,7 +5922,7 @@
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "eventstore_sys_cpu{instance=~\"$Instance\"}",
+              "expr": "kurrentdb_sys_cpu{instance=~\"$Instance\"}",
               "format": "time_series",
               "instant": false,
               "interval": "",
@@ -6077,17 +5939,15 @@
       "type": "row"
     }
   ],
+  "preload": false,
   "refresh": "5s",
-  "schemaVersion": 39,
+  "schemaVersion": 40,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": true,
-          "text": [
-            "All"
-          ],
+          "text": "All",
           "value": [
             "$__all"
           ]
@@ -6097,7 +5957,6 @@
           "uid": "PBFA97CFB590B2093"
         },
         "definition": "label_values(instance)",
-        "hide": 0,
         "includeAll": true,
         "multi": true,
         "name": "Instance",
@@ -6108,8 +5967,6 @@
         },
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       }
     ]
@@ -6118,23 +5975,10 @@
     "from": "now-5m",
     "to": "now"
   },
-  "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "10s",
-      "30s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h",
-      "1d"
-    ]
-  },
+  "timepicker": {},
   "timezone": "",
-  "title": "Eventstore Panels",
+  "title": "KurrentDB Panels",
   "uid": "XuEZimpVz",
-  "version": 12,
+  "version": 43,
   "weekStart": ""
 }
