@@ -1,14 +1,16 @@
-version: '3.8'
-
 networks:
   kurrent-grafana-network:
+
+volumes:
+  grafana-storage:
+  prometheus-storage:
 
 services:
   prometheus:
     image: prom/prometheus:v3.1.0
     volumes:
       - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./data/prometheus:/prometheus
+      - prometheus-storage:/prometheus
     ports:
       - 9090:9090
     networks:
@@ -20,8 +22,8 @@ services:
     image: grafana/grafana:11.5.1
     volumes:
       - ./config/grafana/etc-grafana-provisioning:/etc/grafana/provisioning
-      - ./data/grafana/var-lib-grafana:/var/lib/grafana
       - ./dashboards:/var/lib/grafana/dashboards
+      - grafana-storage:/var/lib/grafana
     ports:
       - 3000:3000
     networks:
