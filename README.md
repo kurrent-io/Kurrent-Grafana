@@ -74,8 +74,7 @@ _todo: automate!_
 ### Clean up (optional)
 
 - this is not usually necessary, updating to a commit with a different version of the dashboard will cause it to be reimported into the existing database
-- docker-compose rm
-- delete the data directory (nothing in there is committed)
+- docker-compose down -v
 
 ## Alternative to Edit/Export: directly edit the json
 
