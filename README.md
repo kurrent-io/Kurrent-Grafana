@@ -71,6 +71,10 @@ _todo: automate!_
     - `Save to file` and use this file for uploading
 4. upload (todo: elaborate)
 
+### 8. Create github release with link to grafana.com
+
+(this announces the release in #release-announcements)
+
 ### Clean up (optional)
 
 - this is not usually necessary, updating to a commit with a different version of the dashboard will cause it to be reimported into the existing database
