@@ -25,7 +25,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
+  "id": 2,
   "links": [],
   "panels": [
     {
@@ -255,7 +255,7 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "",
+      "description": "LIMITATION: This will show incorrect (far too high) values if nodes from multiple clusters are exporting metrics to the same datasource",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -326,7 +326,7 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "TODO: take account of the current period",
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -383,7 +383,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "(sum(kurrentdb_incoming_grpc_calls_total{instance=~\"$Instance\", kind=~\"deadline-exceeded|failed|unimplemented\"})) / scalar(kurrentdb_incoming_grpc_calls_total{instance=~\"$Instance\", kind=\"total\"})",
+          "expr": "(sum(rate(kurrentdb_incoming_grpc_calls_total{instance=~\"$Instance\", kind=~\"deadline-exceeded|failed|unimplemented\"}[$__rate_interval]))) / scalar(rate(kurrentdb_incoming_grpc_calls_total{instance=~\"$Instance\", kind=\"total\"}[$__rate_interval]))",
           "interval": "",
           "legendFormat": "{{instance}}",
           "range": true,
@@ -430,7 +430,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 9,
         "w": 4,
         "x": 8,
         "y": 1
@@ -517,63 +517,49 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 1,
+          "decimals": 0,
           "mappings": [],
-          "max": 1,
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "orange",
-                "value": 0.9
               }
             ]
           },
-          "unit": "percentunit"
+          "unit": "eps"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
-        "w": 5,
+        "h": 5,
+        "w": 4,
         "x": 12,
         "y": 1
       },
-      "id": 51,
+      "id": 136,
       "options": {
-        "displayMode": "gradient",
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "maxVizHeight": 300,
-        "minVizHeight": 10,
-        "minVizWidth": 0,
-        "namePlacement": "auto",
-        "orientation": "horizontal",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
-            "last"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
-        "showUnfilled": true,
-        "sizing": "auto",
-        "valueMode": "color"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
       "pluginVersion": "11.5.1",
       "targets": [
@@ -582,19 +568,20 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
+          "disableTextWrap": false,
           "editorMode": "builder",
-          "exemplar": false,
-          "expr": "irate(kurrentdb_queue_busy_seconds_total{instance=~\"$Instance\"}[$__rate_interval])",
-          "format": "time_series",
-          "instant": true,
+          "expr": "rate(kurrentdb_io_events_total{instance=~\"$Instance\"}[$__rate_interval])",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
           "interval": "",
-          "legendFormat": "{{queue}}",
-          "range": false,
-          "refId": "A"
+          "legendFormat": "{{activity}}",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
         }
       ],
-      "title": "Queue Busyness",
-      "type": "bargauge"
+      "title": "Events",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -629,8 +616,8 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 5,
-        "x": 17,
+        "w": 6,
+        "x": 16,
         "y": 1
       },
       "id": 73,
@@ -839,14 +826,14 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "Bps"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 4,
         "w": 4,
-        "x": 8,
+        "x": 12,
         "y": 6
       },
       "id": 104,
@@ -922,8 +909,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "KurrentDB Summary - Preview",
+  "title": "KurrentDB Summary",
   "uid": "qUIcrl_4z",
-  "version": 26,
+  "version": 6,
   "weekStart": ""
 }
