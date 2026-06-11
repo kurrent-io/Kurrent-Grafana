@@ -98,13 +98,21 @@ Requires Grafana 12 or later (with the same Prometheus data source the dashboard
 1. upload the file, select your Prometheus data source and a target folder
 1. review the preview and confirm
 
-The imported rules are created as Grafana-managed rules with "no data" handling set to Normal, preserving Prometheus semantics (most rules return no series while the system is healthy). Notifications follow your notification policies; the whitepaper covers setting up Slack and email contact points and routing by the rules' `severity` label.
+The imported rules are created as Grafana-managed rules with "no data" handling set to Normal, preserving Prometheus semantics (most rules return no series while the system is healthy). The rules only evaluate — see [Contact points and notification policies](#contact-points-and-notification-policies) below, or nothing is delivered when they fire.
 
 On Grafana 10/11 the import UI is not available — use the provisioning file below instead.
 
 ### Import via provisioning (any Grafana 10.x+)
 
-`./config/grafana/etc-grafana-provisioning/alerting/kurrentdb-alert-rules.yaml` is the same rule set in Grafana's alerting provisioning format. Copy it into `/etc/grafana/provisioning/alerting/` on your Grafana instance, set `datasourceUid` to your Prometheus data source UID (the file ships with `PBFA97CFB590B2093`, the UID this repo's stack uses), and restart Grafana. The rules appear in a "KurrentDB Alerts" folder.
+`./config/grafana/etc-grafana-provisioning/alerting/kurrentdb-alert-rules.yaml` is the same rule set in Grafana's alerting provisioning format. Copy it into `/etc/grafana/provisioning/alerting/` on your Grafana instance, set `datasourceUid` to your Prometheus data source UID (the file ships with `PBFA97CFB590B2093`, the UID this repo's stack uses), and restart Grafana. The rules appear in a "KurrentDB Alerts" folder and start evaluating immediately, but notify no one until the contact points and policies below exist.
+
+### Contact points and notification policies
+
+Neither import path creates contact points or notification policies, and the rules deliberately do not reference a contact point by name — delivery is entirely driven by your notification policy tree matching the labels the rules attach. You must add both, and the names must line up: policies reference contact points by name, and policy matchers must match the rules' labels. Following Steps 3–4 of the whitepaper:
+
+1. **Contact points** — create one per destination, for example `kurrentdb-slack` (Slack bot token) and `kurrentdb-email` (SMTP). The names are your choice, but they must match exactly what your notification policies reference.
+1. **Notification policies** — route on the labels these rules attach: every rule carries `severity` (`warning` or `critical`), and the two parked-message rules add `team=application`. The whitepaper's reference policy: set the default route's contact point to `kurrentdb-slack`, then add a child policy with matcher `severity = critical` pointing at `kurrentdb-email` with **Continue matching subsequent sibling nodes** enabled (so critical alerts also reach Slack), and optionally a child policy matching `team = application` for the channel your application team owns.
+1. **Test before you trust it** — use each contact point's **Test** button, then force one rule to fire (the whitepaper's Step 6 walks through temporarily lowering the disk rule's threshold) and confirm delivery end to end.
 
 ### Trying it in this repo's stack
 
