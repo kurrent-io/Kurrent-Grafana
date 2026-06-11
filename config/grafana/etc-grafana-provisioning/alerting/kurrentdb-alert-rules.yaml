@@ -116,7 +116,7 @@ groups:
           summary: 'CPU on {{ $labels.instance }} above 80% for 10 minutes'
         isPaused: false
 
-      # Whitepaper Rule 4: max GC pause above 200 ms. Baseline this for your workload; keep it below your heartbeat timeout.
+      # Whitepaper Rule 4: max GC pause above 8 s. Baseline this for your workload.
       - uid: kurrentdb-gc-pause-high
         title: KurrentDBGcPauseHigh
         condition: C
@@ -125,7 +125,7 @@ groups:
             relativeTimeRange: { from: 600, to: 0 }
             datasourceUid: PBFA97CFB590B2093
             model:
-              expr: 'max by(instance) (kurrentdb_gc_pause_duration_max_seconds) > 0.2'
+              expr: 'max by(instance) (kurrentdb_gc_pause_duration_max_seconds) > 8.0'
               instant: true
               range: false
               refId: A
@@ -144,7 +144,7 @@ groups:
         labels:
           severity: warning
         annotations:
-          summary: 'GC pause on {{ $labels.instance }} exceeded 200 ms'
+          summary: 'GC pause on {{ $labels.instance }} exceeded 8 s'
         isPaused: false
 
       # Whitepaper Rule 5: reader queueing duration above 0.5 s. Sustained firing usually means IOPS exhaustion.
