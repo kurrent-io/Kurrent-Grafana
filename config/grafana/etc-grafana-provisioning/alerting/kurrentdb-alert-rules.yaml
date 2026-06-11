@@ -1,0 +1,615 @@
+# KurrentDB 26.1 alert rules, from "Monitoring and Alerting for KurrentDB 26.1
+# with Grafana" (Kurrent whitepaper v1.1). Thresholds are starting points;
+# review them against your own workload (see the whitepaper's operational
+# considerations).
+#
+# Grafana alerting provisioning format. Auto-loads into the docker-compose
+# stack in this repo (folder "KurrentDB Alerts"); also usable on any Grafana
+# (10.x+) by copying into /etc/grafana/provisioning/alerting/ and setting
+# datasourceUid to your Prometheus datasource. No contact points or
+# notification policies are provisioned - alerts route via your default
+# policy; the whitepaper covers Slack and email setup.
+# Keep in sync with alerts/kurrentdb-alert-rules.yaml
+#
+# noDataState is OK where a healthy system returns no series (the threshold
+# lives inside the query); rules whose series always exist keep NoData so a
+# vanished series is surfaced.
+
+
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: kurrentdb
+    folder: KurrentDB Alerts
+    interval: 1m
+    rules:
+      # Whitepaper Rule 1: data/log disk utilization above 90%. One series per disk mount per node.
+      - uid: kurrentdb-disk-usage-high
+        title: KurrentDBDiskUsageHigh
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'kurrentdb_sys_disk_bytes{kind="used"} / ignoring(kind) kurrentdb_sys_disk_bytes{kind="total"} > 0.90'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Disk {{ $labels.disk }} on {{ $labels.instance }} is over 90% full'
+        isPaused: false
+
+      # Whitepaper Rule 2: memory utilization above 85%.
+      - uid: kurrentdb-memory-usage-high
+        title: KurrentDBMemoryUsageHigh
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: '1 - (kurrentdb_sys_mem_bytes{kind="free"} / ignoring(kind) kurrentdb_sys_mem_bytes{kind="total"}) > 0.85'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Memory on {{ $labels.instance }} above 85% for 10 minutes'
+        isPaused: false
+
+      # Whitepaper Rule 3: process CPU above 80% (Linux). On Windows use kurrentdb_sys_cpu > 80 instead.
+      - uid: kurrentdb-cpu-high
+        title: KurrentDBCpuHigh
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'kurrentdb_proc_cpu > 80'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'CPU on {{ $labels.instance }} above 80% for 10 minutes'
+        isPaused: false
+
+      # Whitepaper Rule 4: max GC pause above 200 ms. Baseline this for your workload; keep it below your heartbeat timeout.
+      - uid: kurrentdb-gc-pause-high
+        title: KurrentDBGcPauseHigh
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'max by(instance) (kurrentdb_gc_pause_duration_max_seconds) > 0.2'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'GC pause on {{ $labels.instance }} exceeded 200 ms'
+        isPaused: false
+
+      # Whitepaper Rule 5: reader queueing duration above 0.5 s. Sustained firing usually means IOPS exhaustion.
+      - uid: kurrentdb-reader-queue-slow
+        title: KurrentDBReaderQueueSlow
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'max by(instance) (kurrentdb_queue_queueing_duration_max_seconds{name="Readers"}) > 0.5'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Reader queue on {{ $labels.instance }} exceeded 0.5 s for 10 minutes'
+        isPaused: false
+
+      # Whitepaper Rule 6: stream-info cache hit ratio below 80%. `bool` returns 1/0 so the alert can fire even at a 0% ratio.
+      - uid: kurrentdb-cache-hit-ratio-low
+        title: KurrentDBCacheHitRatioLow
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'rate(kurrentdb_cache_hits_misses_total{cache="stream-info",kind="hits"}[10m]) / ignoring(kind) (rate(kurrentdb_cache_hits_misses_total{cache="stream-info",kind="hits"}[10m]) + ignoring(kind) rate(kurrentdb_cache_hits_misses_total{cache="stream-info",kind="misses"}[10m])) < bool 0.80'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: NoData
+        execErrState: Error
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Stream-info cache hit ratio on {{ $labels.instance }} below 80%'
+        isPaused: false
+
+      # Whitepaper Rule 7: projection progress below 99%. `bool` returns 1/0 so the alert can fire even at 0 progress.
+      - uid: kurrentdb-projection-lagging
+        title: KurrentDBProjectionLagging
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'kurrentdb_projection_progress < bool 0.99'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: NoData
+        execErrState: Error
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Projection {{ $labels.projection }} on {{ $labels.instance }} below 99% progress'
+        isPaused: false
+
+      # Whitepaper Rule 8a: projection in the Faulted state.
+      - uid: kurrentdb-projection-faulted
+        title: KurrentDBProjectionFaulted
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'kurrentdb_projection_status{status="Faulted"} == bool 1'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Projection {{ $labels.projection }} on {{ $labels.instance }} is Faulted'
+        isPaused: false
+
+      # Whitepaper Rule 8b: projection not in the Running state. `bool` is required: the plain `== 0` form returns sample value 0, which alert engines treat as not firing.
+      - uid: kurrentdb-projection-not-running
+        title: KurrentDBProjectionNotRunning
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'kurrentdb_projection_running == bool 0'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Projection {{ $labels.projection }} on {{ $labels.instance }} is not Running'
+        isPaused: false
+
+      # Whitepaper Rule 9 (warning tier): the state-size series is only published once state exceeds 50% of MaxProjectionStateSize, so its presence is the warning.
+      - uid: kurrentdb-projection-state-large
+        title: KurrentDBProjectionStateLarge
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'kurrentdb_projection_state_size > 0'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Projection {{ $labels.projection }} state exceeds 50% of the size limit'
+        isPaused: false
+
+      # Whitepaper Rule 9 (critical tier): state above 75% of the configured limit.
+      - uid: kurrentdb-projection-state-critical
+        title: KurrentDBProjectionStateCritical
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'kurrentdb_projection_state_size / on() group_left max(kurrentdb_projection_state_size_bound{bound="LIMIT"}) > 0.75'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Projection {{ $labels.projection }} state exceeds 75% of the size limit'
+        isPaused: false
+
+      # Whitepaper Rule 10: persistent subscription more than 1,000 events behind. For subscriptions to $all, use the *_commit_position pair with a byte threshold instead.
+      - uid: kurrentdb-persistent-sub-lagging
+        title: KurrentDBPersistentSubLagging
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: '(kurrentdb_persistent_sub_last_known_event_number - kurrentdb_persistent_sub_checkpointed_event_number) > 1000'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Subscription {{ $labels.group_name }} on {{ $labels.event_stream_id }} is more than 1,000 events behind'
+        isPaused: false
+
+      # Whitepaper Rule 11: parked messages present. team=application routes to the team that owns subscriber logic.
+      - uid: kurrentdb-parked-messages
+        title: KurrentDBParkedMessages
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'kurrentdb_persistent_sub_parked_messages > 0'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 15m
+        labels:
+          severity: warning
+          team: application
+        annotations:
+          summary: 'Subscription {{ $labels.group_name }} on {{ $labels.event_stream_id }} has parked messages'
+        isPaused: false
+
+      # Whitepaper Rule 11 (companion): oldest parked message over an hour old - catches parked-and-forgotten.
+      - uid: kurrentdb-parked-message-age
+        title: KurrentDBParkedMessageAge
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'kurrentdb_persistent_sub_oldest_parked_message_seconds > 3600'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 15m
+        labels:
+          severity: warning
+          team: application
+        annotations:
+          summary: 'Oldest parked message on {{ $labels.group_name }} is over an hour old'
+        isPaused: false
+
+      # Whitepaper Rule 12: failed gRPC call rate above 0.1/s.
+      - uid: kurrentdb-grpc-failures
+        title: KurrentDBGrpcFailures
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'rate(kurrentdb_incoming_grpc_calls_total{kind="failed"}[5m]) > 0.1'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'gRPC failures on {{ $labels.instance }} above 0.1 per second'
+        isPaused: false
+
+      # Whitepaper Rule 12 (companion): deadline-exceeded specifically points at an overloaded or stalling node.
+      - uid: kurrentdb-grpc-deadline-exceeded
+        title: KurrentDBGrpcDeadlineExceeded
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'rate(kurrentdb_incoming_grpc_calls_total{kind="deadline-exceeded"}[5m]) > 0.1'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'gRPC deadline-exceeded on {{ $labels.instance }} above 0.1 per second'
+        isPaused: false
+
+      # Whitepaper Rule 13: node not responding to scrapes. The job regex matches both the whitepaper scrape config (kurrentdb) and this repo's (scrape-kurrentdb); align it with your own job name. `bool` is required for the rule to fire (see Rule 8b).
+      - uid: kurrentdb-node-down
+        title: KurrentDBNodeDown
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'up{job=~".*kurrentdb.*"} == bool 0'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: NoData
+        execErrState: Error
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'KurrentDB node {{ $labels.instance }} is not responding to scrapes'
+        isPaused: false
+
+      # Whitepaper Rule 14: a leader election happened in the last 15 minutes. Zero pending period: the counter increase is already a completed event.
+      - uid: kurrentdb-election-occurred
+        title: KurrentDBElectionOccurred
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'increase(kurrentdb_elections_count_total[15m]) > 0'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'A leader election occurred on the cluster in the last 15 minutes'
+        isPaused: false
+
+      # Whitepaper Rule 15: follower more than 100 MB of transaction log behind the leader. `on() group_right` matches the label-less max() against the per-node replication checkpoints (the whitepaper's expression omits it and never matches).
+      - uid: kurrentdb-replication-lag
+        title: KurrentDBReplicationLag
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: 'max(kurrentdb_checkpoints{name="writer"}) - on() group_right kurrentdb_checkpoints{name="replication"} > 100000000'
+              instant: true
+              range: false
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: { type: gt, params: [0] }
+        noDataState: OK
+        execErrState: Error
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Follower {{ $labels.instance }} is more than 100 MB behind the leader'
+        isPaused: false
