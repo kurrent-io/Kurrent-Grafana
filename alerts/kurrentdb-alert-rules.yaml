@@ -1,0 +1,203 @@
+# KurrentDB 26.1 alert rules, from "Monitoring and Alerting for KurrentDB 26.1
+# with Grafana" (Kurrent whitepaper v1.1). Thresholds are starting points;
+# review them against your own workload (see the whitepaper's operational
+# considerations).
+#
+# Prometheus rule-group format. Import options:
+#   * Grafana 12+: Alerting -> Alert rules -> Import alert rules -> upload this
+#     file, pick your Prometheus data source and a target folder.
+#   * Any Prometheus-compatible ruler (Prometheus, Mimir, Cortex) can load this
+#     file directly.
+# Keep in sync with config/grafana/etc-grafana-provisioning/alerting/kurrentdb-alert-rules.yaml
+#
+# Conditions that compare against 0 or a lower bound use the PromQL `bool`
+# modifier so the expression returns 1 when the condition holds; without it a
+# matched sample value of 0 reads as "not firing".
+
+
+groups:
+  - name: kurrentdb
+    interval: 1m
+    rules:
+      # Whitepaper Rule 1: data/log disk utilization above 90%. One series per disk mount per node.
+      - alert: KurrentDBDiskUsageHigh
+        expr: kurrentdb_sys_disk_bytes{kind="used"} / ignoring(kind) kurrentdb_sys_disk_bytes{kind="total"} > 0.90
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Disk {{ $labels.disk }} on {{ $labels.instance }} is over 90% full'
+      # Whitepaper Rule 1 (optional variant): index disks need far more
+      # headroom because index merges temporarily require additional space.
+      # If your index is on its own mount, enable this with your mount point.
+      # - alert: KurrentDBIndexDiskUsageHigh
+      #   expr: kurrentdb_sys_disk_bytes{kind="used", disk="/var/lib/kurrentdb/index"} / ignoring(kind) kurrentdb_sys_disk_bytes{kind="total", disk="/var/lib/kurrentdb/index"} > 0.40
+      #   for: 5m
+      #   labels:
+      #     severity: warning
+      #   annotations:
+      #     summary: Index disk on {{ $labels.instance }} is over 40% full; index merges need headroom
+
+      # Whitepaper Rule 2: memory utilization above 85%.
+      - alert: KurrentDBMemoryUsageHigh
+        expr: 1 - (kurrentdb_sys_mem_bytes{kind="free"} / ignoring(kind) kurrentdb_sys_mem_bytes{kind="total"}) > 0.85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Memory on {{ $labels.instance }} above 85% for 10 minutes'
+
+      # Whitepaper Rule 3: process CPU above 80% (Linux). On Windows use kurrentdb_sys_cpu > 80 instead.
+      - alert: KurrentDBCpuHigh
+        expr: kurrentdb_proc_cpu > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'CPU on {{ $labels.instance }} above 80% for 10 minutes'
+
+      # Whitepaper Rule 4: max GC pause above 8 s. Baseline this for your workload.
+      - alert: KurrentDBGcPauseHigh
+        expr: max by(instance) (kurrentdb_gc_pause_duration_max_seconds) > 8.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'GC pause on {{ $labels.instance }} exceeded 8 s'
+
+      # Whitepaper Rule 5: reader queueing duration above 0.5 s. Sustained firing usually means IOPS exhaustion.
+      - alert: KurrentDBReaderQueueSlow
+        expr: max by(instance) (kurrentdb_queue_queueing_duration_max_seconds{name="Readers"}) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Reader queue on {{ $labels.instance }} exceeded 0.5 s for 10 minutes'
+
+      # Whitepaper Rule 6: stream-info cache hit ratio below 80%. `bool` returns 1/0 so the alert can fire even at a 0% ratio.
+      - alert: KurrentDBCacheHitRatioLow
+        expr: rate(kurrentdb_cache_hits_misses_total{cache="stream-info",kind="hits"}[10m]) / ignoring(kind) (rate(kurrentdb_cache_hits_misses_total{cache="stream-info",kind="hits"}[10m]) + ignoring(kind) rate(kurrentdb_cache_hits_misses_total{cache="stream-info",kind="misses"}[10m])) < bool 0.80
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Stream-info cache hit ratio on {{ $labels.instance }} below 80%'
+
+      # Whitepaper Rule 7: projection progress below 99%. `bool` returns 1/0 so the alert can fire even at 0 progress.
+      - alert: KurrentDBProjectionLagging
+        expr: kurrentdb_projection_progress < bool 0.99
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Projection {{ $labels.projection }} on {{ $labels.instance }} below 99% progress'
+
+      # Whitepaper Rule 8a: projection in the Faulted state.
+      - alert: KurrentDBProjectionFaulted
+        expr: kurrentdb_projection_status{status="Faulted"} == bool 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Projection {{ $labels.projection }} on {{ $labels.instance }} is Faulted'
+
+      # Whitepaper Rule 8b: projection not in the Running state. `bool` is required: the plain `== 0` form returns sample value 0, which alert engines treat as not firing.
+      - alert: KurrentDBProjectionNotRunning
+        expr: kurrentdb_projection_running == bool 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Projection {{ $labels.projection }} on {{ $labels.instance }} is not Running'
+
+      # Whitepaper Rule 9 (warning tier): the state-size series is only published once state exceeds 50% of MaxProjectionStateSize, so its presence is the warning.
+      - alert: KurrentDBProjectionStateLarge
+        expr: kurrentdb_projection_state_size > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Projection {{ $labels.projection }} state exceeds 50% of the size limit'
+
+      # Whitepaper Rule 9 (critical tier): state above 75% of the configured limit.
+      - alert: KurrentDBProjectionStateCritical
+        expr: kurrentdb_projection_state_size / on() group_left max(kurrentdb_projection_state_size_bound{bound="LIMIT"}) > 0.75
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Projection {{ $labels.projection }} state exceeds 75% of the size limit'
+
+      # Whitepaper Rule 10: persistent subscription more than 1,000 events behind. For subscriptions to $all, use the *_commit_position pair with a byte threshold instead.
+      - alert: KurrentDBPersistentSubLagging
+        expr: (kurrentdb_persistent_sub_last_known_event_number - kurrentdb_persistent_sub_checkpointed_event_number) > 1000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Subscription {{ $labels.group_name }} on {{ $labels.event_stream_id }} is more than 1,000 events behind'
+
+      # Whitepaper Rule 11: parked messages present. team=application routes to the team that owns subscriber logic.
+      - alert: KurrentDBParkedMessages
+        expr: kurrentdb_persistent_sub_parked_messages > 0
+        for: 15m
+        labels:
+          severity: warning
+          team: application
+        annotations:
+          summary: 'Subscription {{ $labels.group_name }} on {{ $labels.event_stream_id }} has parked messages'
+
+      # Whitepaper Rule 11 (companion): oldest parked message over an hour old - catches parked-and-forgotten.
+      - alert: KurrentDBParkedMessageAge
+        expr: kurrentdb_persistent_sub_oldest_parked_message_seconds > 3600
+        for: 15m
+        labels:
+          severity: warning
+          team: application
+        annotations:
+          summary: 'Oldest parked message on {{ $labels.group_name }} is over an hour old'
+
+      # Whitepaper Rule 12: failed gRPC call rate above 0.1/s.
+      - alert: KurrentDBGrpcFailures
+        expr: rate(kurrentdb_incoming_grpc_calls_total{kind="failed"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'gRPC failures on {{ $labels.instance }} above 0.1 per second'
+
+      # Whitepaper Rule 12 (companion): deadline-exceeded specifically points at an overloaded or stalling node.
+      - alert: KurrentDBGrpcDeadlineExceeded
+        expr: rate(kurrentdb_incoming_grpc_calls_total{kind="deadline-exceeded"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'gRPC deadline-exceeded on {{ $labels.instance }} above 0.1 per second'
+
+      # Whitepaper Rule 13: node not responding to scrapes. The job regex matches both the whitepaper scrape config (kurrentdb) and this repo's (scrape-kurrentdb); align it with your own job name. `bool` is required for the rule to fire (see Rule 8b).
+      - alert: KurrentDBNodeDown
+        expr: up{job=~".*kurrentdb.*"} == bool 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'KurrentDB node {{ $labels.instance }} is not responding to scrapes'
+
+      # Whitepaper Rule 14: a leader election happened in the last 15 minutes. Zero pending period: the counter increase is already a completed event.
+      - alert: KurrentDBElectionOccurred
+        expr: increase(kurrentdb_elections_count_total[15m]) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'A leader election occurred on the cluster in the last 15 minutes'
+
+      # Whitepaper Rule 15: follower more than 100 MB of transaction log behind the leader. `on() group_right` matches the label-less max() against the per-node replication checkpoints (the whitepaper's expression omits it and never matches).
+      - alert: KurrentDBReplicationLag
+        expr: max(kurrentdb_checkpoints{name="writer"}) - on() group_right kurrentdb_checkpoints{name="replication"} > 100000000
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Follower {{ $labels.instance }} is more than 100 MB behind the leader'
